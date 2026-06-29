@@ -344,12 +344,12 @@ while [ $# -gt 0 ]; do
 		shift 1
 		;;
 	--runtime-args | --docker-args)
-		[ $# -gt 0 ] || usage
+		[ $# -gt 1 ] || usage
 		KAS_EXTRA_RUNTIME_ARGS="${KAS_EXTRA_RUNTIME_ARGS} $2"
 		shift 2
 		;;
 	--ssh-dir)
-		[ $# -gt 2 ] || usage
+		[ $# -gt 1 ] || usage
 		KAS_SSH_DIR="$2"
 		shift 2
 		;;
@@ -361,18 +361,18 @@ while [ $# -gt 0 ]; do
 		shift 1
 		;;
 	--aws-dir)
-		[ $# -gt 2 ] || usage
+		[ $# -gt 1 ] || usage
 		KAS_AWS_DIR="$2"
 		shift 2
 		;;
 	--git-credential-store)
-		[ $# -gt 2 ] || usage
+		[ $# -gt 1 ] || usage
 		KAS_GIT_CREDENTIAL_STORE="$2"
 		shift 2
 		;;
 
 	--git-credential-socket)
-		[ $# -gt 2 ] || usage
+		[ $# -gt 1 ] || usage
 		KAS_GIT_CREDENTIAL_SOCKET="$2"
 		shift 2
 		;;
