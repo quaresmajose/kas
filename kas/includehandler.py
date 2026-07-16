@@ -260,12 +260,12 @@ class IncludeHandler:
                   file: include-repo1.yml
                 - repo: repo2
                   file: include-repo2.yml
-                - include3.yml
+                - include2.yml
             -------
 
-            Includes are merged in in this order:
-            ['include1.yml', 'include2.yml', 'include-repo1.yml',
-             'include-repo2.yml', 'include-repo2.yml', 'topfile.yml']
+            Includes are merged in this order:
+            ['include1.yml', 'include-repo1.yml', 'include-repo2.yml',
+            'include2.yml', 'topfile.yml']
             On conflict the latter includes overwrite previous ones and
             the current file overwrites every include. (evaluation depth first
             and from top to bottom)
