@@ -70,6 +70,8 @@ usage()
 	            "To force the use\n"
 	printf "%b" "\t\t\tof run0 over sudo, set KAS_SUDO_CMD=run0.\n"
 	printf "%b" "--isar-rootless\t\tRun an Isar build in rootless mode.\n"
+	printf "%b" "--kvm\t\tPass /dev/kvm into the container (for runqemu/testimage KVM\n" \
+			"acceleration) and grant the build user access to it."
 	printf "%b" "--runtime-args\t\tAdditional arguments to pass to the " \
 			"container runtime.\n"
 	printf "%b" "\t\t\tfor running the build.\n"
@@ -342,6 +344,10 @@ while [ $# -gt 0 ]; do
 		;;
 	--isar-rootless)
 		BUILD_SYSTEM="isar-rootless"
+		shift 1
+		;;
+	--kvm)
+		KAS_KVM="1"
 		shift 1
 		;;
 	--runtime-args | --docker-args)
@@ -689,6 +695,14 @@ if [ -n "${AWS_WEB_IDENTITY_TOKEN_FILE}" ] ; then
 	set -- "$@" -v "$(realpath -e "${AWS_WEB_IDENTITY_TOKEN_FILE}")":/var/kas/userdata/.aws/web_identity_token:ro \
 		-e AWS_WEB_IDENTITY_TOKEN_FILE="${AWS_CONFIG_FILE:-/var/kas/userdata/.aws/web_identity_token}" \
 		-e AWS_ROLE_ARN="${AWS_ROLE_ARN}"
+fi
+
+if [ -n "${KAS_KVM}" ]; then
+	if [ -c /dev/kvm ]; then
+		set -- "$@" --device=/dev/kvm
+	else
+		warning "--kvm given but /dev/kvm not present on host; skipping"
+	fi
 fi
 
 KAS_GIT_CREDENTIAL_HELPER_DEFAULT=""
