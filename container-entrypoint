@@ -104,6 +104,29 @@ restore_managed_dirs_owner()
 	chown_managed_dirs 0 0
 }
 
+# Grant the build user access to /dev/kvm if requested. The device is
+# passed with its host GID, which won't match any container group, so
+# create/point a group at that GID and add builder to it. gosu picks up
+# supplementary groups, so no host-side permission change is needed.
+add_kvm_group_id()
+{
+	if [ -c /dev/kvm ]; then
+		# get numeric group ID of the device
+		DEV_GID_NUM="$(stat -c '%g' /dev/kvm)"
+		# checks if there is any group with that numeric ID
+		DEV_GID_NAME="$(getent group "$DEV_GID_NUM" | cut -d: -f1)"
+		# We already have a group with that numeric ID?
+		if [ -z "$DEV_GID_NAME" ]; then
+			# There is no group with this numeric ID, so let's create it
+			DEV_GID_NAME=hostkvm
+			groupadd --non-unique --gid "$DEV_GID_NUM" "$DEV_GID_NAME"
+		fi
+		# Finally, added the user 'builder' to the group with the numeric ID
+		# of the device /dev/kvm provided by the host machine
+		usermod --append --groups "$DEV_GID_NAME" builder
+	fi
+}
+
 if mount | grep -q "on / type aufs"; then
     cat <<EOF >&2
 WARNING: Generation of wic images will fail!
@@ -139,6 +162,7 @@ else
 
 	groupmod -o --gid "$GROUP_ID" builder
 	usermod -o --uid "$USER_ID" --gid "$GROUP_ID" builder >/dev/null
+	add_kvm_group_id
 	chown -R "$USER_ID":"$GROUP_ID" /builder
 	# copy host SSH config into home of builder
 	if [ -d /var/kas/userdata/.ssh ]; then
