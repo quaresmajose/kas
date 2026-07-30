@@ -522,7 +522,7 @@ if [ "${KAS_CMD}" = "menu" ]; then
 
 	# When using the menu plugin, we need to track the KAS_REPO_DIR outside
 	# of the container to later allow a simple `kas-container build`. For
-	# that, we tell the kas menu plugin via an env-var about the location
+	# that, we tell the kas menu command via an env-var about the location
 	# on the host. This data is then added to the .config.yaml where it can
 	# be evaluated by the next invocation of kas-container.
 

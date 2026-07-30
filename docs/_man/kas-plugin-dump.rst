@@ -1,7 +1,7 @@
 :orphan:
 
-kas dump plugin
-===============
+kas dump command
+================
 
 .. argparse::
     :module: kas.kas

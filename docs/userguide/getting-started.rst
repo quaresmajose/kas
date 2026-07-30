@@ -41,8 +41,8 @@ This project depends on
 - jsonschema Python 3 package
 - PyYAML Python 3 package
 - GitPython Python 3 package
-- kconfiglib Python 3 package (optional, for menu plugin)
-- NEWT Python 3 distro package (optional, for menu plugin)
+- kconfiglib Python 3 package (optional, for ``menu`` command)
+- NEWT Python 3 distro package (optional, for ``menu`` command)
 - python-gnupg Python 3 package (optional, for signature verification)
 
 Usage

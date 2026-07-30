@@ -150,10 +150,10 @@ overwritten using the ``env`` section of the config file.
 |                          | script.                                          |
 +--------------------------+--------------------------------------------------+
 | ``SHELL``                | The shell to start when using the ``shell``      |
-| (C,K,E)                  | plugin and in the bitbake environment.           |
+| (C,K,E)                  | command and in the bitbake environment.          |
 +--------------------------+--------------------------------------------------+
 | ``TERM``                 | The terminal options used in the ``shell``       |
-| (C,K,E)                  | plugin and in the bitbake environment.           |
+| (C,K,E)                  | command and in the bitbake environment.          |
 +--------------------------+--------------------------------------------------+
 | ``TZ`` (C)               | Timezone settings.                               |
 +--------------------------+--------------------------------------------------+

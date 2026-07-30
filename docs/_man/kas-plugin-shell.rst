@@ -1,7 +1,7 @@
 :orphan:
 
-kas shell plugin
-================
+kas shell command
+=================
 
 .. argparse::
     :module: kas.kas

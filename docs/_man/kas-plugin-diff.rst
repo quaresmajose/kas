@@ -1,7 +1,7 @@
 :orphan:
 
-kas diff plugin
-===============
+kas diff command
+================
 
 .. argparse::
     :module: kas.kas

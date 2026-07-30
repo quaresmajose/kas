@@ -1,7 +1,7 @@
 :orphan:
 
-kas for-all-repos plugin
-========================
+kas for-all-repos command
+=========================
 
 .. argparse::
     :module: kas.kas

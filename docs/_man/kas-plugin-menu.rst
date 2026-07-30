@@ -1,7 +1,7 @@
 :orphan:
 
-kas menu plugin
-===============
+kas menu command
+================
 
 .. argparse::
     :module: kas.kas

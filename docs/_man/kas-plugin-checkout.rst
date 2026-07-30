@@ -1,7 +1,7 @@
 :orphan:
 
-kas checkout plugin
-===================
+kas checkout command
+====================
 
 .. argparse::
     :module: kas.kas

@@ -1,7 +1,7 @@
 :orphan:
 
-kas lock plugin
-===============
+kas lock command
+================
 
 .. argparse::
     :module: kas.kas

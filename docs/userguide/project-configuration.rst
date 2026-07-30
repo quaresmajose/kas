@@ -225,8 +225,8 @@ and its corresponding lockfile ``kas/kas-isar.lock.yml``.
       isar:
         commit: 0336610df8bb0adce76ef8c5a921c758efed9f45
 
-The ``lock`` plugin provides helpers to simplify the creation and update
-of lockfiles. For details, see the plugins documentation: :mod:`kas.plugins.lock`.
+The ``lock`` command simplifies the creation and update of lockfiles. For
+details, see the command's documentation: :mod:`kas.plugins.lock`.
 
 Configuration reference
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -443,14 +443,14 @@ Configuration reference
   Each variable
   corresponds to a Kconfig configuration variable and can be of the types
   string, boolean or integer. The content of this key is typically
-  maintained by the ``kas menu`` plugin in a ``.config.yaml`` file.
+  maintained by the ``kas menu`` command in a ``.config.yaml`` file.
 
 ``artifacts``: dict [optional]
   :kasschemadesc:`artifacts`
   Each key-value pair describes an identifier and a path relative to the kas
   build dir, whereby the path can contain wildcards like ``*``. Unix-style
   globbing is applied to all paths. In case no artifact is found, the build is
-  considered successful, if not stated otherwise by the used plugin and mode
+  considered successful, if not stated otherwise by the used command and mode
   of operation.
 
   .. note:: There are no further semantics attached to the identifiers (yet).

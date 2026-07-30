@@ -1,7 +1,7 @@
 :orphan:
 
-kas build plugin
-================
+kas build command
+=================
 
 .. argparse::
     :module: kas.kas
