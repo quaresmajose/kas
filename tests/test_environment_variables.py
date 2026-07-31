@@ -37,6 +37,13 @@ from kas.libcmds import SetupHome, SetupSSHAgent
 from kas import __version__
 
 
+def mock_global_context():
+    def args():
+        None
+    args.no_color = False
+    return create_global_context(args)
+
+
 @pytest.mark.dirsfromenv
 def test_build_dir_is_placed_inside_work_dir_by_default(monkeykas, tmpdir):
     conf_dir = str(tmpdir / 'test_env_variables')
@@ -209,20 +216,20 @@ def test_env_section_export_bb_env_passthrough_additions(monkeykas, tmpdir):
 def test_managed_env_detection(monkeykas):
     with monkeykas.context() as mp:
         mp.setenv('GITLAB_CI', 'true')
-        ctx = create_global_context([])
+        ctx = mock_global_context()
         me = ctx.managed_env
         assert bool(me)
         assert str(me) == 'GitLab CI'
     with monkeykas.context() as mp:
         mp.setenv('GITHUB_ACTIONS', 'true')
-        ctx = create_global_context([])
+        ctx = mock_global_context()
         me = ctx.managed_env
         assert bool(me)
         assert str(me) == 'GitHub Actions'
     with monkeykas.context() as mp:
         mp.setenv('REMOTE_CONTAINERS', 'true')
         mp.setenv('REMOTE_CONTAINERS_FOO', 'bar')
-        ctx = create_global_context([])
+        ctx = mock_global_context()
         me = ctx.managed_env
         assert bool(me)
         assert str(me) == 'VSCode Remote Containers'
@@ -231,7 +238,7 @@ def test_managed_env_detection(monkeykas):
 
 @pytest.mark.dirsfromenv
 def test_env_file_processing(monkeykas, tmpdir):
-    ctx = create_global_context([])
+    ctx = mock_global_context()
     rcfiles = [
         ('NETRC_FILE', '.netrc'),
         ('NPMRC_FILE', '.npmrc'),
@@ -271,7 +278,7 @@ def test_env_file_processing(monkeykas, tmpdir):
 def test_env_set_but_not_existing(monkeykas):
     with monkeykas.context() as mp:
         mp.setenv('NETRC_FILE', '/path/does/not/exist')
-        ctx = create_global_context([])
+        ctx = mock_global_context()
         with pytest.raises(EnvSetButNotFoundError):
             SetupHome().execute(ctx)
 
@@ -280,18 +287,18 @@ def test_kas_container_version(monkeykas, caplog):
     caplog.set_level(logging.WARNING)
     with monkeykas.context() as mp:
         # not a kas-container call
-        create_global_context([])
+        mock_global_context()
         assert 'versions do not match' not in caplog.text
         caplog.clear()
     with monkeykas.context() as mp:
         # kas-container call from matching script
         mp.setenv('KAS_CONTAINER_SCRIPT_VERSION', __version__)
-        create_global_context([])
+        mock_global_context()
         assert 'versions do not match' not in caplog.text
         caplog.clear()
     with monkeykas.context() as mp:
         # kas-container call from older/newer script
         mp.setenv('KAS_CONTAINER_SCRIPT_VERSION', '0.0')
-        create_global_context([])
+        mock_global_context()
         assert 'versions do not match' in caplog.text
         caplog.clear()

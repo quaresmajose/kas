@@ -245,6 +245,9 @@ overwritten using the ``env`` section of the config file.
 | (C,K)                    | and install buildtools. If not set, kas will use |
 |                          | ``KAS_BUILD_DIR/buildtools`` as the default path.|
 +--------------------------+--------------------------------------------------+
+| NO_COLOR (C,K,E)         | Prevents the addition of ANSI color to all output|
+|                          | when this variable has a non-empty value.        |
++--------------------------+--------------------------------------------------+
 
 .. |aws_cred| replace:: ``AWS_ROLE_ARN``
                         ``AWS_SHARED_CREDENTIALS_FILE``

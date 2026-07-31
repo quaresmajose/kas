@@ -302,6 +302,7 @@ class Menu:
             build_args.extra_bitbake_args = []
             build_args.skip = None
             build_args.provenance = False
+            build_args.no_color = ctx.no_color
 
             Build().run(build_args)
 

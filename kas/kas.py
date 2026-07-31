@@ -47,7 +47,7 @@ __copyright__ = 'Copyright (c) Siemens AG, 2017-2018'
 DEFAULT_LOG_LEVEL = 'info'
 
 
-def create_logger():
+def create_logger(no_color=False):
     """
         Setup the logging environment
     """
@@ -55,17 +55,15 @@ def create_logger():
     set_global_loglevel(DEFAULT_LOG_LEVEL.upper())
     format_str = '%(asctime)s - %(levelname)-8s - %(message)s'
     date_format = '%Y-%m-%d %H:%M:%S'
-    if os.isatty(2):
-        cformat = '%(log_color)s' + format_str
-        colors = {'DEBUG': 'reset',
-                  'INFO': 'reset',
-                  'WARNING': 'bold_yellow',
-                  'ERROR': 'bold_red',
-                  'CRITICAL': 'bold_red'}
-        formatter = colorlog.ColoredFormatter(cformat, date_format,
-                                              log_colors=colors)
-    else:
-        formatter = logging.Formatter(format_str, date_format)
+    cformat = '%(log_color)s' + format_str
+    colors = {'DEBUG': 'reset',
+              'INFO': 'reset',
+              'WARNING': 'bold_yellow',
+              'ERROR': 'bold_red',
+              'CRITICAL': 'bold_red'}
+    formatter = colorlog.ColoredFormatter(cformat, date_format,
+                                          log_colors=colors,
+                                          no_color=no_color)
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
     log.addHandler(stream_handler)
@@ -158,6 +156,10 @@ def kas_get_argparser():
                         default=f'{DEFAULT_LOG_LEVEL}',
                         help=f'Set log level (default: {DEFAULT_LOG_LEVEL})')
 
+    parser.add_argument('--no-color',
+                        action='store_true',
+                        help='Disable colors for all outputs')
+
     subparser = parser.add_subparsers(dest='cmd')
 
     for plugin in plugins.all():
@@ -191,10 +193,18 @@ def kas(argv):
     """
         The actual main entry point of kas.
     """
-    create_logger()
-
     parser = kas_get_argparser()
     args = parser.parse_args(argv)
+
+    # unset NO_COLOR environment variable if it is an empty string, as colorlog
+    # only checks for the presence to disable colors, but the convention is
+    # to check for an non-empty string (see https://no-color.org/).
+    if os.environ.get('NO_COLOR') == '':
+        del os.environ['NO_COLOR']
+    create_logger(args.no_color or not sys.stderr.isatty())
+    args.no_color = args.no_color \
+        or os.environ.get('NO_COLOR', '') != '' \
+        or not sys.stdout.isatty()
 
     if args.log_level:
         set_global_loglevel(args.log_level.upper())

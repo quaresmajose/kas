@@ -40,7 +40,10 @@ def fixed_version(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def with_kas_context():
-    context.create_global_context(None)
+    def args():
+        None
+    args.no_color = False
+    context.create_global_context(args)
     yield
     context.__context__ = None
 

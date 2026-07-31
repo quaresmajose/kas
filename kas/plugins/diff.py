@@ -37,7 +37,7 @@
 
 import json
 import difflib
-from kas.context import create_global_context
+from kas.context import create_global_context, get_context
 from kas.config import Config
 from kas.libcmds import Macro
 from kas.libkas import setup_parser_common_args
@@ -72,9 +72,6 @@ class Diff:
                             action='store_true',
                             help='Use git oneline output for differing '
                                  'commits.')
-        parser.add_argument('--no-color',
-                            action='store_true',
-                            help='Disable colored highlighting of diffs.')
         parser.add_argument('--commit-only',
                             action='store_true',
                             help='This will not display the differences in '
@@ -119,7 +116,7 @@ class Diff:
 
     @staticmethod
     def formatting_diff_output(oldfile, newfile, diff_output, oneline,
-                               no_color, commit_only, content_only):
+                               commit_only, content_only):
         """
         Format the diff output.
         """
@@ -147,7 +144,7 @@ class Diff:
                 else:
                     print(f"{' ' * 8}{line}", end='')
 
-        if no_color:
+        if get_context().no_color:
             COLORS_OLD = ''
             COLORS_NEW = ''
             COLORS_COMMIT = ''
@@ -268,8 +265,7 @@ class Diff:
         else:
             Diff.formatting_diff_output(args.config1, args.config2,
                                         diff_output, args.oneline,
-                                        args.no_color, args.commit_only,
-                                        args.content_only)
+                                        args.commit_only, args.content_only)
 
 
 __KAS_PLUGINS__ = [Diff]

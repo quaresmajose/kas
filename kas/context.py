@@ -91,6 +91,7 @@ class Context:
         if not clone_depth.isdigit():
             raise KasUserError('KAS_CLONE_DEPTH must be a number')
         self.repo_clone_depth = max(int(clone_depth), 0)
+        self.args = args
         self.setup_initial_environ()
         self.check_container_call()
         # Register the paths that kas created and exclusively owns
@@ -99,7 +100,6 @@ class Context:
             self.managed_paths.add(self.__kas_build_dir)
         self.keyhandler = {}
         self.config = None
-        self.args = args
         self.unpinned_repo_warnings = True
 
     def setup_initial_environ(self):
@@ -130,6 +130,10 @@ class Context:
             val = os.environ.get(key, None)
             if val:
                 self.environ[key] = val
+        # Propagate --no-color to sub-processes that follow the NO_COLOR
+        # convention (no-color.org, e.g. bitbake)
+        if self.args.no_color:
+            self.environ['NO_COLOR'] = '1'
 
         # make remote containers environment available in kas
         if self.managed_env == ManagedEnvironment.VSCODE_REMOTE_CONTAINERS:
@@ -189,6 +193,10 @@ class Context:
     @property
     def update(self):
         return getattr(self.args, 'update', None)
+
+    @property
+    def no_color(self):
+        return getattr(self.args, 'no_color', False)
 
     @property
     def managed_env(self):

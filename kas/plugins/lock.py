@@ -119,7 +119,7 @@ class Lock:
             logging.warning(e)
             return
         Diff.formatting_diff_output(
-            None, None, {'vcs': diff}, True, False, True, False)
+            None, None, {'vcs': diff}, True, True, False)
 
     def _update_lockfile(self, lockfile, repos_to_lock, update_only, args):
         """
