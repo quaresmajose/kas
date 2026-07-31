@@ -32,16 +32,11 @@ import asyncio
 import distro
 import traceback
 import logging
+import colorlog
 import signal
 import sys
 import os
 from .kasusererror import KasUserError, CommandExecError
-
-try:
-    import colorlog
-    HAVE_COLORLOG = True
-except ImportError:
-    HAVE_COLORLOG = False
 
 from . import __version__, __file_version__, __compatible_file_version__
 from . import plugins
@@ -60,7 +55,7 @@ def create_logger():
     set_global_loglevel(DEFAULT_LOG_LEVEL.upper())
     format_str = '%(asctime)s - %(levelname)-8s - %(message)s'
     date_format = '%Y-%m-%d %H:%M:%S'
-    if HAVE_COLORLOG and os.isatty(2):
+    if os.isatty(2):
         cformat = '%(log_color)s' + format_str
         colors = {'DEBUG': 'reset',
                   'INFO': 'reset',
