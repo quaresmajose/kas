@@ -7,7 +7,7 @@ Installation
 pipx is the recommended way to install kas. It creates an isolated Python
 virtual environment for kas and makes sure its dependencies are installed
 correctly. To install pipx, follow the instructions at
-https://pipx.pypa.io/stable/installation/
+https://pipx.pypa.io/stable/how-to/install-pipx.html
 
 To install the latest version of kas using pipx run::
 
