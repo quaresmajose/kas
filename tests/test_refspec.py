@@ -327,3 +327,48 @@ def test_sha_like_branch_tag(monkeykas, tmpdir, capsys):
     test_non_commit('branch', '123456789abcdef0123456789abcdef012345678')
 
     test_non_commit('tag', '123456789abcdef0123456789abcdef012345679')
+
+
+@pytest.mark.online
+def test_abbreviated_commit(monkeykas, tmpdir, capsys):
+    """
+        Test if an abbreviated sha1 hash is correctly detected and flagged.
+    """
+    def test_abbreviated(format):
+        tdir = str(tmpdir / format)
+        os.mkdir(tdir)
+        monkeykas.chdir(tdir)
+
+        (rc, _) = run_cmd(['git', 'init', f'--object-format={format}', 'test'],
+                          fail=False)
+        assert rc == 0
+
+        with open(f'{tdir}/test/oe-init-build-env', 'w') as f:
+            f.write('/bin/true')
+
+        (rc, _) = run_cmd(['git', 'add', 'oe-init-build-env'],
+                          cwd='test', fail=False)
+        assert rc == 0
+        (rc, _) = run_cmd(['git', 'commit', '-m commit'],
+                          cwd='test', fail=False)
+        assert rc == 0
+        (rc, commit) = run_cmd(['git', 'log', '--pretty=%H'],
+                               cwd='test', fail=False)
+        assert rc == 0
+
+        len = 12 if format == 'sha1' else 40
+        with open(f'{tdir}/abbreviated.yml', 'w') as f:
+            f.write('header:\n')
+            f.write('  version: 23\n')
+            f.write('repos:\n')
+            f.write('  checkout:\n')
+            f.write(f'    url: file://{tdir}/test\n')
+            f.write(f'    commit: {commit[:len]}\n')
+
+        kas.kas(['checkout', 'abbreviated.yml'])
+        assert capsys.readouterr().err.count(
+            'is not a full-length hash for repo "checkout".') == 1
+
+    test_abbreviated('sha1')
+
+    test_abbreviated('sha256')
