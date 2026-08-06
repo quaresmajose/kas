@@ -335,10 +335,6 @@ class Repo:
             disable_operations = True
 
         if repo_type == 'git':
-            if commit and not re.match(r'^[0-9a-f]{40}|[0-9a-f]{64}$', commit):
-                logging.warning(
-                    f'{commit} is not a full-length hash for repo '
-                    f'"{name}". This will be an error in future versions.')
             return GitRepo(name, url, path, commit, tag, branch, refspec,
                            layers, patches, signers, disable_operations)
         if repo_type == 'hg':
@@ -539,19 +535,22 @@ class RepoImpl(Repo):
                     f'in repository "{self.name}"')
             # check if branch contains the requested commit.
             # skip check on shallow clones, as branch information is missing
-            if self.commit and not get_context().repo_clone_depth:
-                (_, output) = run_cmd(self.branch_contains_ref(),
-                                      cwd=self.path,
-                                      fail=False)
-                if not output.strip():
-                    raise RepoRefError(
-                        f'Branch "{self.branch}" in '
-                        f'repository "{self.name}" does not contain '
-                        f'commit "{self.commit}"')
+            if self.commit:
+                self.check_commit_spec()
+                if not get_context().repo_clone_depth:
+                    (_, output) = run_cmd(self.branch_contains_ref(),
+                                          cwd=self.path,
+                                          fail=False)
+                    if not output.strip():
+                        raise RepoRefError(
+                            f'Branch "{self.branch}" in '
+                            f'repository "{self.name}" does not contain '
+                            f'commit "{self.commit}"')
 
             desired_ref = self.commit or output.strip()
             is_branch = True
         elif self.commit:
+            self.check_commit_spec()
             desired_ref = self.commit
             is_branch = False
         else:
@@ -845,6 +844,21 @@ class GitRepo(RepoImpl):
             })
         return diff_json
 
+    def check_commit_spec(self):
+        (retc, output) = run_cmd(
+            ['git', 'rev-parse', '--verify', '--end-of-options',
+             f'{self.commit}^{{commit}}'],
+            cwd=self.path)
+        actual_commit = output.strip()
+        if actual_commit == self.commit:
+            return
+        elif actual_commit.startswith(self.commit):
+            logging.warning(
+                f'{self.commit} is not a full-length hash for repo '
+                f'"{self.name}".\n'
+                'This eases supply chain attacks '
+                'and will be an error in future versions.')
+
 
 class MercurialRepo(RepoImpl):
     """
@@ -937,6 +951,9 @@ class MercurialRepo(RepoImpl):
 
     def diff(self, commit1, commit2):
         raise NotImplementedError("Unsupported diff for MercurialRepo")
+
+    def check_commit_spec(self):
+        pass
 
 
 @dataclass
