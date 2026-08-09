@@ -858,6 +858,10 @@ class GitRepo(RepoImpl):
                 f'"{self.name}".\n'
                 'This eases supply chain attacks '
                 'and will be an error in future versions.')
+        else:
+            raise RepoRefError(
+                f'Parsed commit {actual_commit} '
+                f'differs suspiciously from specified {self.commit}.')
 
 
 class MercurialRepo(RepoImpl):
