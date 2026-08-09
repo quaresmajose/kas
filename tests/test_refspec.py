@@ -295,7 +295,8 @@ def test_commit_expand(monkeykas, tmpdir, capsys):
         'abd109469d17b7ff4d958b5aa5ab5f5511cc4d43'
 
 
-def check_invalid_commit(monkeykas, tdir, variant, commit):
+def check_invalid_commit(monkeykas, tdir, variant, commit, exception,
+                         expected_commit=None):
     shutil.copytree('tests/test_refspec', tdir)
     monkeykas.chdir(tdir)
 
@@ -316,22 +317,75 @@ def check_invalid_commit(monkeykas, tdir, variant, commit):
         f.write(f'    url: file://{tdir}/kas\n')
         f.write(f'    commit: {commit}\n')
 
-    with pytest.raises(CommandExecError):
+    if exception:
+        with pytest.raises(exception):
+            kas.kas(['checkout', 'sha-test.yml'])
+    else:
         kas.kas(['checkout', 'sha-test.yml'])
+        (rc, output) = run_cmd(['git', 'log', '--pretty=%H', '-1'],
+                               cwd='kas-2', fail=False)
+        assert rc == 0
+        assert output.strip() == expected_commit
 
 
 @pytest.mark.online
 def test_sha_like_branch_nonexist(monkeykas, tmpdir, capsys):
     tdir = str(tmpdir / 'test_sha_like_branch_nonexist')
     check_invalid_commit(monkeykas, tdir, 'branch',
-                         '123456789abcdef0123456789abcdef012345678')
+                         '123456789abcdef0123456789abcdef012345678',
+                         CommandExecError)
+
+
+@pytest.mark.online
+def test_sha_like_branch_exist(monkeykas, tmpdir, capsys):
+    tdir = str(tmpdir / 'test_sha_like_branch_exist')
+    check_invalid_commit(monkeykas, tdir, 'branch',
+                         '8a82d22f123ea9242eabb91334b654dcf7410b7f',
+                         None, '8a82d22f123ea9242eabb91334b654dcf7410b7f')
 
 
 @pytest.mark.online
 def test_sha_like_tag_nonexist(monkeykas, tmpdir, capsys):
     tdir = str(tmpdir / 'test_sha_like_tag_nonexist')
     check_invalid_commit(monkeykas, tdir, 'tag',
-                         '123456789abcdef0123456789abcdef012345679')
+                         '123456789abcdef0123456789abcdef012345679',
+                         CommandExecError)
+
+
+@pytest.mark.online
+def test_sha_like_tag_exist(monkeykas, tmpdir, capsys):
+    tdir = str(tmpdir / 'test_sha_like_tag_exist')
+    check_invalid_commit(monkeykas, tdir, 'tag',
+                         '8a82d22f123ea9242eabb91334b654dcf7410b7f',
+                         None, '8a82d22f123ea9242eabb91334b654dcf7410b7f')
+
+
+@pytest.mark.online
+def test_abbrev_sha_like_branch_nonexist(monkeykas, tmpdir, capsys):
+    tdir = str(tmpdir / 'test_abbrev_sha_like_branch_nonexist')
+    check_invalid_commit(monkeykas, tdir, 'branch',
+                         '123456789abc', RepoRefError)
+
+
+@pytest.mark.online
+def test_abbrev_sha_like_branch_exist(monkeykas, tmpdir, capsys):
+    tdir = str(tmpdir / 'test_abbrev_sha_like_branch_exist')
+    check_invalid_commit(monkeykas, tdir, 'branch',
+                         '8a82d22f123e', RepoRefError)
+
+
+@pytest.mark.online
+def test_abbrev_sha_like_tag_nonexist(monkeykas, tmpdir, capsys):
+    tdir = str(tmpdir / 'test_abbrev_sha_like_tag_nonexist')
+    check_invalid_commit(monkeykas, tdir, 'tag',
+                         '123456789abc', RepoRefError)
+
+
+@pytest.mark.online
+def test_abbrev_sha_like_tag_exist(monkeykas, tmpdir, capsys):
+    tdir = str(tmpdir / 'test_abbrev_sha_like_tag_exist')
+    check_invalid_commit(monkeykas, tdir, 'tag',
+                         '8a82d22f123e', RepoRefError)
 
 
 @pytest.mark.online
