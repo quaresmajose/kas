@@ -18,7 +18,10 @@ specific backend, set, e.g., ``KAS_CONTAINER_ENGINE=podman``. See
 :ref:`env-vars-label` for details.
 
 The simplest and therefore recommended setup for secure rootless operation is
-via Podman. Running under docker in
+via Podman. For building in ``isar-rootless`` mode, the host kernel version
+must be v6.7 or newer.
+
+Running under docker in
 `rootless mode <https://docs.docker.com/engine/security/rootless/>`_ is
 partially supported. For rootless Docker, it is recommended to use a distinct
 ``KAS_WORK_DIR`` outside of the calling directory (repo-dir), as kas
