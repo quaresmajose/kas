@@ -271,6 +271,32 @@ class Menu:
 
         ctx = create_global_context(args)
 
+        if ctx.no_color:
+            os.environ['NEWT_COLORS'] = ' \
+                root=black,white; \
+                border=black,white; \
+                window=black,white; \
+                shadow=white,black; \
+                title=black,white; \
+                button=black,white; \
+                actbutton=white,black; \
+                checkbox=black,white; \
+                actcheckbox=white,black; \
+                entry=black,white; \
+                label=black,white; \
+                listbox=black,white; \
+                actlistbox=white,black; \
+                textbox=black,white; \
+                acttextbox=white,black; \
+                helpline=white,black; \
+                roottext=black,white; \
+                emptyscale=black,white; \
+                fullscale=white,black; \
+                disentry=black,white; \
+                compactbutton=black,white; \
+                actsellistbox=white,black; \
+                sellistbox=white,black'
+
         kconfig_file = os.path.abspath(args.kconfig)
         try:
             self.kconf = Kconfig(kconfig_file, warn_to_stderr=False)
