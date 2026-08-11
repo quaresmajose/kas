@@ -28,8 +28,10 @@ do_enable_qemu_binfmts()
 		sudo mount -t binfmt_misc null /proc/sys/fs/binfmt_misc || return
 	fi
 	for CONF in /usr/lib/binfmt.d/qemu-*.conf; do
-		if ! [ -f /proc/sys/fs/binfmt_misc/"$(basename "${CONF%%.conf}")" ]; then
-			sudo sh -c "cat '$CONF' > /proc/sys/fs/binfmt_misc/register" || return
+		conffile=/proc/sys/fs/binfmt_misc/"$(basename "${CONF%%.conf}")"
+		if ! [ -f "$conffile" ]; then
+			sudo sh -c "cat '$CONF' > /proc/sys/fs/binfmt_misc/register" || \
+				[ -f "$conffile" ] || return
 		fi
 	done
 }
