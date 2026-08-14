@@ -45,13 +45,12 @@ enable_qemu_binfmts()
 }
 
 # For rootless nesting of the uid_ns, we need to provide a list of sub
-# uids/gids which can be used in the sub namespace. As each id in the
-# sub namespace must be mappable into the parent namespace, we need to
-# compute the mapping based on the layout of the parent: Podman maps
-# to an intermediate namespace, hence giving us a user-id map we
-# actually can use for further splitting. Docker maps directly, hence
-# we need to compute the number of sub ids we can use (which have a
-# mapping in the parent ns)
+# uids/gids which can be used in the sub namespace. Those ids have to be
+# expressed in the id space of this namespace, i.e. column 1 of
+# /proc/self/uid_map: Podman maps to an intermediate namespace, hence
+# giving us a user-id map we actually can use for further splitting.
+# Docker maps directly, hence we need to compute the number of sub ids
+# we can use (which have a mapping in the parent ns)
 #
 # Note, that the default range (65k) does NOT allow to map nobody/nogroup,
 # in the sub-namespace, as this usually is id 65k-1 and we loose at least
@@ -61,28 +60,25 @@ enable_qemu_binfmts()
 setup_userns_mappings()
 {
 	UID_ROW=$(sort -rn /proc/self/uid_map | head -1)
-	UID_OUTER=$(printf '%s' "$UID_ROW" | awk '{print $1}')
-	UID_INNER=$(printf '%s' "$UID_ROW" | awk '{print $2}')
+	UID_BASE=$(printf '%s' "$UID_ROW" | awk '{print $1}')
 	UID_COUNT=$(printf '%s' "$UID_ROW" | awk '{print $3}')
 	GID_ROW=$(sort -rn /proc/self/gid_map | head -1)
-	GID_OUTER=$(printf '%s' "$GID_ROW" | awk '{print $1}')
-	GID_INNER=$(printf '%s' "$GID_ROW" | awk '{print $2}')
+	GID_BASE=$(printf '%s' "$GID_ROW" | awk '{print $1}')
 	GID_COUNT=$(printf '%s' "$GID_ROW" | awk '{print $3}')
 
-	# docker (direct mapping)
-	if [ "$UID_OUTER" = "1" ]; then
-		UID_INNER="$(($(id -u builder) + 1))"
-		[ "$UID_INNER" -lt "$UID_COUNT" ] && \
-			UID_COUNT="$((UID_COUNT - UID_INNER))"
+	if [ "$UID_BASE" = "1" ]; then
+		UID_BASE="$(($(id -u builder) + 1))"
+		[ "$UID_BASE" -lt "$UID_COUNT" ] && \
+			UID_COUNT="$((UID_COUNT - UID_BASE))"
 	fi
-	if [ "$GID_OUTER" = "1" ]; then
-		GID_INNER="$(($(id -g builder) + 1))"
-		[ "$GID_INNER" -lt "$GID_COUNT" ] && \
-			GID_COUNT="$((GID_COUNT - GID_INNER))"
+	if [ "$GID_BASE" = "1" ]; then
+		GID_BASE="$(($(id -g builder) + 1))"
+		[ "$GID_BASE" -lt "$GID_COUNT" ] && \
+			GID_COUNT="$((GID_COUNT - GID_BASE))"
 	fi
 
-	echo "builder:${UID_INNER}:${UID_COUNT}" | sudo tee /etc/subuid > /dev/null
-	echo "builder:${GID_INNER}:${GID_COUNT}" | sudo tee /etc/subgid > /dev/null
+	echo "builder:${UID_BASE}:${UID_COUNT}" | sudo tee /etc/subuid > /dev/null
+	echo "builder:${GID_BASE}:${GID_COUNT}" | sudo tee /etc/subgid > /dev/null
 }
 
 # kas-isar: enable_qemu_binfmts
