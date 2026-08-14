@@ -60,11 +60,11 @@ enable_qemu_binfmts()
 # See man user_namespaces for details.
 setup_userns_mappings()
 {
-	UID_ROW=$(sort -r /proc/self/uid_map | head -1)
+	UID_ROW=$(sort -rn /proc/self/uid_map | head -1)
 	UID_OUTER=$(printf '%s' "$UID_ROW" | awk '{print $1}')
 	UID_INNER=$(printf '%s' "$UID_ROW" | awk '{print $2}')
 	UID_COUNT=$(printf '%s' "$UID_ROW" | awk '{print $3}')
-	GID_ROW=$(sort -r /proc/self/gid_map | head -1)
+	GID_ROW=$(sort -rn /proc/self/gid_map | head -1)
 	GID_OUTER=$(printf '%s' "$GID_ROW" | awk '{print $1}')
 	GID_INNER=$(printf '%s' "$GID_ROW" | awk '{print $2}')
 	GID_COUNT=$(printf '%s' "$GID_ROW" | awk '{print $3}')
