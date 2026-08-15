@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Check out repo
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
     - name: Install Checkcode dependencies
       run: |
         pip install flake8 pycodestyle doc8 Pygments
@@ -40,7 +40,7 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - name: Check out repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - name: PyTest
         uses: ./.github/actions/perform-tests
         with:
@@ -64,7 +64,7 @@ jobs:
         distro-release: ["debian-bookworm", "debian-trixie"]
     steps:
       - name: Check out repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - name: Set up docker build
         uses: ./.github/actions/docker-init
         with:
@@ -74,7 +74,7 @@ jobs:
           distro-release: ${{ matrix.distro-release }}
 
       - name: Build ${{ matrix.image-name }} image
-        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294  # v7.0.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a  # v7.3.0
         with:
           context: /home/runner/kas-clone
           target: ${{ matrix.image-name }}
@@ -86,7 +86,7 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/${{ matrix.image-name }}:next-${{ matrix.distro-release }}
       - name: Cache downloads
         id: cache-downloads
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7  # v5.0.4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
         with:
           path: |
             image-tests/${{ matrix.image-name }}/build/downloads
@@ -131,7 +131,7 @@ jobs:
           mv .cache-downloads build/downloads
       - name: Complete build and deploy ${{ matrix.image-name }} image
         if: github.ref == 'refs/heads/next'
-        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294  # v7.0.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a  # v7.3.0
         id: push
         with:
           context: /home/runner/kas-clone
@@ -148,7 +148,7 @@ jobs:
           annotations: ${{ env.DOCKER_METADATA_OUTPUT_ANNOTATIONS }}
       - name: Attest ${{ matrix.image-name }} image
         if: github.ref == 'refs/heads/next'
-        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26  # v4.1.0
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6  # v4.2.2
         with:
           subject-name: ghcr.io/${{ github.repository }}/${{ matrix.image-name }}
           subject-digest: ${{ steps.push.outputs.digest }}
@@ -165,7 +165,7 @@ jobs:
       matrix:
         image-name: ["kas", "kas-isar"]
     steps:
-      - uses: dataaxiom/ghcr-cleanup-action@f092b48ba3b604b2a83690dc4b2bbb3392e1045f  # v1.3.1
+      - uses: dataaxiom/ghcr-cleanup-action@d52806a0dc70b430571a37da1fde39733ffd640f  # v1.2.2
         with:
           dry-run: false
           validate: true
