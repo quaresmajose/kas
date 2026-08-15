@@ -84,6 +84,13 @@ jobs:
             DEBIAN_TAG=${{ env.DEBIAN_TAG }}
           outputs: type=docker,rewrite-timestamp=true
           tags: ghcr.io/${{ github.repository }}/${{ matrix.image-name }}:next-${{ matrix.distro-release }}
+      - name: Cache downloads
+        id: cache-downloads
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7  # v5.0.4
+        with:
+          path: |
+            image-tests/${{ matrix.image-name }}/build/downloads
+          key: cache-downloads-${{ matrix.image-name }}-${{ matrix.distro-release }}
       - name: Test ${{ matrix.image-name }} image
         env:
           KAS_CONTAINER_IMAGE: ghcr.io/${{ github.repository }}/${{ matrix.image-name }}:next-${{ matrix.distro-release }}
@@ -95,6 +102,7 @@ jobs:
             ../../kas-container build kas-buildtools.yml
           fi
           [ -d build/tmp ]
+          cp -a build/downloads .cache-downloads
           echo "Test kas clean"
           ../../kas-container clean kas.yml
           ! [ -d build/tmp/deploy ]
@@ -119,6 +127,8 @@ jobs:
               exit 1
             }
           fi
+          mkdir -p build
+          mv .cache-downloads build/downloads
       - name: Complete build and deploy ${{ matrix.image-name }} image
         if: github.ref == 'refs/heads/next'
         uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294  # v7.0.0
