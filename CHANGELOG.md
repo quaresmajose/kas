@@ -1,3 +1,19 @@
+5.5
+- kas: Make sure to always warn about abbreviated git commit hashes (GHSA-6p9r-86f2-f954)
+- kas: Fail if read-back commit sha is deviating from specified one (GHSA-6p9r-86f2-f954)
+- kas: Add support for hash equivalence servers
+- kas: Make colorlog a mandatory dependency
+- kas: Add kas-wide support for NO_COLOR env var or --no-color option
+- kas-container: add kvm passthrough argument option
+- kas-container: Ship kas-container script with container again
+- kas-container: Account for race during binfmt_misc setup, specifically in CI
+- kas-container: Restore appending to runtime-args on repeated usage
+- kas-container: Fix subuid/subgid range computation for isar-rootless mode
+- docs: Improve setup description for kas-container
+- docs: Add host kernel version dependency for isar-rootless
+- docs: Refer to subcommands as commands, rather than plugins
+- release: Stop signing pip packages, PyPI does not support that anymore
+
 5.4
 - kas: only disable ssh host key checking in CI environments (CVE-2026-54548)
 - kas: add support for isar-rootless build system
